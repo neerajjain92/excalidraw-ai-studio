@@ -5,11 +5,20 @@ import type { AppState, ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/t
 import "@excalidraw/excalidraw/index.css";
 import './index.css';
 import { GitHubExplorer } from './components/GitHubExplorer';
+import { GitHubSaver } from './components/GitHubSaver';
+import { AIChat } from './components/AIChat';
 
 function App() {
   const [excalidrawAPI, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI | null>(null);
   const [jsonValue, setJsonValue] = useState<string>("[]");
   const isUpdatingFromJSON = useRef(false);
+  const [isPanelOpen, setIsPanelOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState<'files' | 'chat'>('files');
+
+  // GitHub State
+  const [currentFilePath, setCurrentFilePath] = useState('');
+  const [currentFileSha, setCurrentFileSha] = useState('');
+  const [currentRepoUrl, setCurrentRepoUrl] = useState('');
 
   // Handle changes from Excalidraw
   const onChange = (elements: readonly ExcalidrawElement[], appState: AppState) => {
@@ -77,8 +86,12 @@ function App() {
     setTimeout(() => { isUpdatingFromJSON.current = false; }, 50);
   };
 
-  const onGitHubFileSelect = (content: string) => {
+  const onGitHubFileSelect = (content: string, path: string, sha: string, repoUrl: string) => {
     setJsonValue(content);
+    setCurrentFilePath(path);
+    setCurrentFileSha(sha);
+    setCurrentRepoUrl(repoUrl);
+
     try {
       const parsed = JSON.parse(content);
       updateSceneFromJSON(parsed);
@@ -87,21 +100,68 @@ function App() {
     }
   };
 
+  const onAIChatUpdate = (content: string) => {
+    setJsonValue(content);
+    try {
+      const parsed = JSON.parse(content);
+      updateSceneFromJSON(parsed);
+    } catch (e) {
+      console.error("Invalid JSON from AI", e);
+    }
+  };
+
   return (
     <div className="container">
-      <div className="left-panel">
-        <GitHubExplorer onFileSelect={onGitHubFileSelect} />
-        <div className="json-panel-header">
-          JSON Editor
+      {isPanelOpen && (
+        <div className="left-panel">
+          <div className="panel-tabs">
+            <button
+              className={`tab-btn ${activeTab === 'files' ? 'active' : ''}`}
+              onClick={() => setActiveTab('files')}
+            >
+              Files
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'chat' ? 'active' : ''}`}
+              onClick={() => setActiveTab('chat')}
+            >
+              AI Chat
+            </button>
+          </div>
+
+          {activeTab === 'files' ? (
+            <>
+              <GitHubExplorer onFileSelect={onGitHubFileSelect} />
+              <GitHubSaver
+                content={jsonValue}
+                initialPath={currentFilePath}
+                initialSha={currentFileSha}
+                repoUrl={currentRepoUrl}
+              />
+            </>
+          ) : (
+            <AIChat onJsonUpdate={onAIChatUpdate} />
+          )}
+
+          <div className="json-panel-header">
+            JSON Editor
+          </div>
+          <textarea
+            className="json-editor"
+            value={jsonValue}
+            onChange={onJsonChange}
+            spellCheck={false}
+          />
         </div>
-        <textarea
-          className="json-editor"
-          value={jsonValue}
-          onChange={onJsonChange}
-          spellCheck={false}
-        />
-      </div>
+      )}
       <div className="excalidraw-panel">
+        <button
+          className="panel-toggle"
+          onClick={() => setIsPanelOpen(!isPanelOpen)}
+          title={isPanelOpen ? "Close Panel" : "Open Panel"}
+        >
+          {isPanelOpen ? "◀" : "▶"}
+        </button>
         <Excalidraw
           excalidrawAPI={(api) => setExcalidrawAPI(api)}
           onChange={onChange}

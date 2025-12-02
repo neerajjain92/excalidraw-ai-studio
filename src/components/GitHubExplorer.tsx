@@ -7,7 +7,7 @@ interface GitHubFile {
 }
 
 interface GitHubExplorerProps {
-    onFileSelect: (content: string) => void;
+    onFileSelect: (content: string, path: string, sha: string, repoUrl: string) => void;
 }
 
 export const GitHubExplorer: React.FC<GitHubExplorerProps> = ({ onFileSelect }) => {
@@ -65,7 +65,7 @@ export const GitHubExplorer: React.FC<GitHubExplorerProps> = ({ onFileSelect }) 
 
             const data = await response.json();
             const content = atob(data.content);
-            onFileSelect(content);
+            onFileSelect(content, file.path, file.sha, repoUrl);
         } catch (err: any) {
             setError("Failed to load file: " + err.message);
         } finally {
