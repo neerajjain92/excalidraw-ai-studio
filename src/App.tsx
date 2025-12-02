@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Excalidraw, restoreElements } from "@excalidraw/excalidraw";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 import type { AppState, ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
@@ -10,10 +10,29 @@ import { AIChat } from './components/AIChat';
 
 function App() {
   const [excalidrawAPI, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI | null>(null);
-  const [jsonValue, setJsonValue] = useState<string>("[]");
+  const [jsonValue, setJsonValue] = useState<string>(() => {
+    return localStorage.getItem('excalidraw_data') || "[]";
+  });
   const isUpdatingFromJSON = useRef(false);
   const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [activeTab, setActiveTab] = useState<'files' | 'chat'>('files');
+
+  // Save to localStorage whenever jsonValue changes
+  useEffect(() => {
+    localStorage.setItem('excalidraw_data', jsonValue);
+  }, [jsonValue]);
+
+  // Restore scene when API is ready
+  useEffect(() => {
+    if (excalidrawAPI && jsonValue !== "[]") {
+      try {
+        const parsed = JSON.parse(jsonValue);
+        updateSceneFromJSON(parsed);
+      } catch (e) {
+        console.error("Failed to restore from localStorage", e);
+      }
+    }
+  }, [excalidrawAPI]);
 
   // GitHub State
   const [currentFilePath, setCurrentFilePath] = useState('');
