@@ -1,73 +1,131 @@
-# React + TypeScript + Vite
+# Excalidraw AI Studio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**Excalidraw AI Studio** is a supercharged environment for creating, editing, and managing Excalidraw diagrams. It bridges the gap between visual creativity and code-based management, enhanced with AI capabilities and seamless GitHub integration.
 
-Currently, two official plugins are available:
+![Excalidraw AI Studio Banner](https://raw.githubusercontent.com/excalidraw/excalidraw/master/public/og-image-2.png)
+*(Note: Replace with actual screenshot of the app)*
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Key Features
 
-## React Compiler
+-   **🎨 Full Excalidraw Experience**: Embedded full-featured Excalidraw editor.
+-   **↔️ Bi-Directional Sync**: Real-time synchronization between the visual canvas and a raw JSON editor. Edit the code to change the drawing, or draw to update the code.
+-   **📂 GitHub File Explorer**: Browse your GitHub repositories directly from the sidebar. Load `.excalidraw` and `.json` files instantly.
+-   **💾 Save to GitHub**: Commit and push changes directly to your repository using a Personal Access Token (PAT). No more manual file uploads.
+-   **🤖 AI Chat Integration**: Describe your diagram in plain English, and watch the AI generate it for you (Mock implementation currently).
+-   **⚡ Productivity UI**: Collapsible sidebars, tabbed navigation, and a clean split-pane layout.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🛠 Architecture & Data Flow
 
-## Expanding the ESLint configuration
+### Application Flow
+```mermaid
+graph TD
+    User[User]
+    subgraph "Excalidraw AI Studio"
+        Canvas[Excalidraw Canvas]
+        Editor[JSON Editor]
+        Sync[Sync Engine]
+        Explorer[GitHub Explorer]
+        Saver[GitHub Saver]
+        AI[AI Chat]
+    end
+    subgraph "External Services"
+        GitHub[GitHub API]
+        LLM[LLM Service]
+    end
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+    User -->|Draws| Canvas
+    User -->|Edits Code| Editor
+    Canvas <-->|Bi-directional Update| Sync
+    Sync <-->|Bi-directional Update| Editor
+    
+    User -->|Browses| Explorer
+    Explorer -->|Fetches Files| GitHub
+    GitHub -->|Returns Content| Explorer
+    Explorer -->|Loads| Editor
+    
+    User -->|Saves| Saver
+    Saver -->|Commits & Pushes| GitHub
+    
+    User -->|Prompts| AI
+    AI -->|Generates JSON| Sync
+    AI -.->|Future Integration| LLM
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Component Structure
+```mermaid
+classDiagram
+    class App {
+        +State jsonValue
+        +State excalidrawAPI
+        +State activeTab
+    }
+    class Sidebar {
+        +Tabs (Files/Chat)
+    }
+    class GitHubExplorer {
+        +fetchFiles()
+        +loadContent()
+    }
+    class GitHubSaver {
+        +commitAndPush()
+    }
+    class AIChat {
+        +sendMessage()
+        +generateDiagram()
+    }
+    class ExcalidrawWrapper {
+        +onChange()
+    }
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+    App --> Sidebar
+    App --> ExcalidrawWrapper
+    Sidebar --> GitHubExplorer
+    Sidebar --> GitHubSaver
+    Sidebar --> AIChat
 ```
+
+## 🏁 Getting Started
+
+### Prerequisites
+-   Node.js (v18+)
+-   A GitHub Account (for repo integration)
+
+### Installation
+
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/neerajjain92/excalidraw-ai-studio.git
+    cd excalidraw-ai-studio
+    ```
+
+2.  **Install dependencies**
+    ```bash
+    npm install
+    ```
+
+3.  **Run the development server**
+    ```bash
+    npm run dev
+    ```
+
+4.  Open [http://localhost:5173](http://localhost:5173) in your browser.
+
+## 📖 Usage Guide
+
+### GitHub Integration
+1.  **Generate a Token**: Click the "(Generate)" link in the "Save to GitHub" section to create a GitHub Personal Access Token (PAT) with `repo` scope.
+2.  **Load Files**: Enter your repository URL (e.g., `https://github.com/username/my-diagrams`) in the Explorer tab.
+3.  **Save Changes**: Select a file, make edits, enter your PAT and a commit message, and click "Commit & Push".
+
+### AI Chat
+1.  Switch to the **AI Chat** tab.
+2.  Type a prompt (e.g., "Draw a system architecture").
+3.  Click **Send** to see the generated diagram on the canvas.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+This project is licensed under the MIT License.
