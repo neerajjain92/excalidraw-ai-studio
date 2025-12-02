@@ -10,9 +10,36 @@ import { AIChat } from './components/AIChat';
 
 function App() {
   const [excalidrawAPI, setExcalidrawAPI] = useState<ExcalidrawImperativeAPI | null>(null);
+
+  // Initialize state from localStorage
+  const [initialData] = useState(() => {
+    try {
+      const saved = localStorage.getItem('excalidraw_data');
+      if (saved && saved !== "[]") {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) {
+          return {
+            elements: restoreElements(parsed, null, { repairBindings: true }),
+            scrollToContent: true
+          };
+        } else if (parsed.elements) {
+          return {
+            elements: restoreElements(parsed.elements, null, { repairBindings: true }),
+            appState: parsed.appState,
+            scrollToContent: true
+          };
+        }
+      }
+    } catch (e) {
+      console.error("Failed to load from localStorage", e);
+    }
+    return null;
+  });
+
   const [jsonValue, setJsonValue] = useState<string>(() => {
     return localStorage.getItem('excalidraw_data') || "[]";
   });
+
   const isUpdatingFromJSON = useRef(false);
   const [isPanelOpen, setIsPanelOpen] = useState(true);
   const [activeTab, setActiveTab] = useState<'files' | 'chat'>('files');
@@ -21,18 +48,6 @@ function App() {
   useEffect(() => {
     localStorage.setItem('excalidraw_data', jsonValue);
   }, [jsonValue]);
-
-  // Restore scene when API is ready
-  useEffect(() => {
-    if (excalidrawAPI && jsonValue !== "[]") {
-      try {
-        const parsed = JSON.parse(jsonValue);
-        updateSceneFromJSON(parsed);
-      } catch (e) {
-        console.error("Failed to restore from localStorage", e);
-      }
-    }
-  }, [excalidrawAPI]);
 
   // GitHub State
   const [currentFilePath, setCurrentFilePath] = useState('');
@@ -186,6 +201,7 @@ function App() {
         <Excalidraw
           excalidrawAPI={(api) => setExcalidrawAPI(api)}
           onChange={onChange}
+          initialData={initialData}
         />
       </div>
     </div>
