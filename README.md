@@ -119,8 +119,18 @@ classDiagram
 
 ### AI Chat
 1.  Switch to the **AI Chat** tab.
-2.  Type a prompt (e.g., "Draw a system architecture").
-3.  Click **Send** to see the generated diagram on the canvas.
+2.  Click the **Settings (⚙️)** icon.
+3.  Select your provider (**OpenAI** or **Anthropic**).
+4.  Enter your **API Key**.
+5.  (Optional) Specify a **Model** (e.g., `gpt-4o`, `claude-3-5-sonnet-latest`).
+6.  Type a prompt (e.g., "Draw a system architecture") and click **Send**.
+
+> **Note**: API keys are stored securely in your browser's `localStorage`.
+
+### Proxy Setup (For Local Development)
+To avoid CORS issues with the Anthropic API, this project uses a Vite proxy.
+The proxy is configured in `vite.config.ts` to forward requests from `/api/anthropic` and `/api/openai` to their respective endpoints.
+Ensure your development server is running (`npm run dev`) for the proxy to work.
 
 ## 🤝 Contributing
 
