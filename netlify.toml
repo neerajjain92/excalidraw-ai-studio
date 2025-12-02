@@ -4,7 +4,7 @@
 
 [[redirects]]
   from = "/api/anthropic/*"
-  to = "https://api.anthropic.com/:splat"
+  to = "/.netlify/functions/anthropic-proxy/:splat"
   status = 200
   force = true
 
