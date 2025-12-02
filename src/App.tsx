@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Excalidraw, convertToExcalidrawElements } from "@excalidraw/excalidraw";
+import { Excalidraw, restoreElements } from "@excalidraw/excalidraw";
 import type { ExcalidrawElement } from "@excalidraw/excalidraw/element/types";
 import type { AppState, ExcalidrawImperativeAPI } from "@excalidraw/excalidraw/types";
 import "@excalidraw/excalidraw/index.css";
@@ -71,13 +71,15 @@ function App() {
     try {
       if (Array.isArray(parsed)) {
         excalidrawAPI.updateScene({
-          elements: convertToExcalidrawElements(parsed),
+          elements: restoreElements(parsed, null, { repairBindings: true }),
         });
+        excalidrawAPI.scrollToContent();
       } else if (parsed.elements) {
         excalidrawAPI.updateScene({
-          elements: convertToExcalidrawElements(parsed.elements),
+          elements: restoreElements(parsed.elements, null, { repairBindings: true }),
           appState: parsed.appState
         });
+        excalidrawAPI.scrollToContent();
       }
     } catch (e) {
       console.error("Failed to update scene", e);

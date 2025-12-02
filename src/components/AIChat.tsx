@@ -22,9 +22,17 @@ Output ONLY the JSON array. Do not include any markdown formatting, explanations
 The JSON should be an array of objects, where each object represents an element (rectangle, ellipse, diamond, arrow, text, line).
 Common properties: type, x, y, width, height, angle, strokeColor, backgroundColor, fillStyle (hachure, cross-hatch, solid), strokeWidth, roughness, opacity.
 
+IMPORTANT for Arrows:
+- Arrows MUST have 'points' array (e.g., [[0,0], [100, 100]]).
+- To connect shapes, use 'startBinding' and 'endBinding'.
+- 'startBinding': { "elementId": "id_of_start_shape", "focus": 0.5, "gap": 1 }
+- 'endBinding': { "elementId": "id_of_end_shape", "focus": 0.5, "gap": 1 }
+- Ensure shapes have explicit 'id' fields so arrows can reference them.
+
 Example output:
 [
   {
+    "id": "rect-1",
     "type": "rectangle",
     "x": 100,
     "y": 100,
@@ -34,6 +42,29 @@ Example output:
     "strokeColor": "#000000",
     "fillStyle": "solid",
     "roughness": 1
+  },
+  {
+    "id": "rect-2",
+    "type": "rectangle",
+    "x": 300,
+    "y": 100,
+    "width": 100,
+    "height": 50,
+    "backgroundColor": "#c9c9ff",
+    "strokeColor": "#000000",
+    "fillStyle": "solid",
+    "roughness": 1
+  },
+  {
+    "type": "arrow",
+    "x": 200,
+    "y": 125,
+    "width": 100,
+    "height": 0,
+    "strokeColor": "#000000",
+    "points": [[0, 0], [100, 0]],
+    "startBinding": { "elementId": "rect-1", "focus": 0.5, "gap": 1 },
+    "endBinding": { "elementId": "rect-2", "focus": 0.5, "gap": 1 }
   }
 ]
 `;
