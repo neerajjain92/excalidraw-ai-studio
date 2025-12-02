@@ -84,6 +84,26 @@ classDiagram
     Sidebar --> AIChat
 ```
 
+## 📂 Codebase Overview
+
+Here's a quick guide to help you navigate the code:
+
+### Key Files
+
+-   **`src/App.tsx`**: The heart of the application. It manages the global state (active tab, file content), handles the Excalidraw instance, and coordinates the sync between the canvas and the JSON editor.
+-   **`src/components/AIChat.tsx`**: Contains the logic for the AI assistant. It handles:
+    -   Prompt engineering (system prompts).
+    -   API calls to OpenAI and Anthropic.
+    -   Parsing AI responses into valid Excalidraw JSON.
+-   **`src/components/GitHubExplorer.tsx`**: Manages the file tree view. It fetches the repository structure from the GitHub API and handles file selection.
+-   **`src/components/GitHubSaver.tsx`**: Handles the "Save to GitHub" functionality. It uses the GitHub API to create commits and push changes.
+
+### How to Navigate
+
+1.  **Start at `App.tsx`**: This is where the main layout and state reside. Follow the props passed to child components to understand how data flows.
+2.  **Check `AIChat.tsx` for AI Logic**: If you want to tweak how the AI generates diagrams, look at the `SYSTEM_PROMPT` and the `processResponse` function in this file.
+3.  **Inspect `vite.config.ts` & `netlify.toml`**: These files handle the routing and proxying, which is crucial for avoiding CORS issues when calling AI APIs.
+
 ## 🏁 Getting Started
 
 ### Prerequisites
