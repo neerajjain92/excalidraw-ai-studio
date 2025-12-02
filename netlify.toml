@@ -2,11 +2,9 @@
   command = "npm run build"
   publish = "dist"
 
-[[redirects]]
-  from = "/api/anthropic/*"
-  to = "/.netlify/functions/anthropic-proxy/:splat"
-  status = 200
-  force = true
+[[edge_functions]]
+  path = "/api/anthropic/*"
+  function = "anthropic-proxy"
 
 [[redirects]]
   from = "/api/openai/*"
